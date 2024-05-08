@@ -212,17 +212,25 @@ export const defaultOptions = {
       urlPrefix: 'https://www.google.com/search?q=$s',
     },
     {
-      name: 'Bing',
-      urlPrefix: 'https://www.bing.com/search?q=$s',
+      name: 'Google Translate Auto/TH',
+      urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
     },
     {
-      name: 'DuckDuckGo',
-      urlPrefix: 'https://duckduckgo.com/?q=$s',
+      name: 'Youtube',
+      urlPrefix: 'https://www.youtube.com/results?search_query=$s',
     },
-    {
-      name: 'dict.cc',
-      urlPrefix: 'https://www.dict.cc/?s=$s',
-    },
+    // {
+    //   name: 'Bing',
+    //   urlPrefix: 'https://www.bing.com/search?q=$s',
+    // },
+    // {
+    //   name: 'DuckDuckGo',
+    //   urlPrefix: 'https://duckduckgo.com/?q=$s',
+    // },
+    // {
+    //   name: 'dict.cc',
+    //   urlPrefix: 'https://www.dict.cc/?s=$s',
+    // },
   ],
 
   /**
@@ -244,11 +252,23 @@ export const defaultOptions = {
       blank: 'https://www.google.com',
     },
     {
-      alias: ['d', 'dict'],
-      name: 'dict.cc',
-      urlPrefix: 'https://www.dict.cc/?s=$s',
-      blank: 'https://www.dict.cc',
+      alias: ['gt', 'translate'],
+      name: 'Google Translate',
+      urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
+      blank: 'https://translate.google.com/',
     },
+    {
+      alias: ['yt', 'youtube'],
+      name: 'Youtube',
+      urlPrefix: 'https://www.youtube.com/results?search_query=$s',
+      blank: 'https://youtube.com/',
+    },
+    // {
+    //   alias: ['d', 'dict'],
+    //   name: 'dict.cc',
+    //   urlPrefix: 'https://www.dict.cc/?s=$s',
+    //   blank: 'https://www.dict.cc',
+    // },
   ],
 
   //////////////////////////////////////////

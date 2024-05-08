@@ -7,13 +7,13 @@ html,
 body,
 #container,
 #search {
-  width: 500px;
-  height: 600px;
+  width: 350px;
+  height: 420px;
   overflow: hidden;
 }
 body {
   background: #eee;
-  color: #777;
+  color: #b6b6b6;
   padding: 0;
   a {
     color: #4494c9;
@@ -31,11 +31,12 @@ body {
 .input:active,
 .input:focus {
   width: 100%;
-  max-width: 500px;
-  min-width: 500px;
-  height: 55px;
+  // do not know what it is, just change according to the new width
+  max-width: 350px;
+  min-width: 350px;
+  height: 45px;
   padding: 4px 8px;
-  font-size: 24px;
+  font-size: 16px;
   border-radius: 0;
   border: none;
   outline: none;
@@ -43,20 +44,22 @@ body {
   border-bottom: 1px solid #ccc;
 }
 #search-input {
-  max-width: 473px;
-  min-width: 473px;
+  // search box
+  max-width: 324px;
+  min-width: 324px;
 }
 .input-description {
   margin: 2px 4px;
 }
 #search-approach-toggle {
+  // search mode button top left
   float: right;
-  height: 55px;
+  height: 45px;
   width: 26px;
   padding: 0 3px 0 0;
   writing-mode: vertical-rl;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 10.5px;
+  font-weight: 700;
   text-align: center;
   background: #fff;
   border-bottom: 1px solid #ccc;
@@ -80,14 +83,14 @@ code {
 }
 .badge {
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   border-radius: 3px;
-  padding: 1px 3px 2px 3px;
+  padding: 1px 2px;
   margin-right: 4px;
   white-space: nowrap;
   display: inline-block;
   position: relative;
-  top: -3px;
+  top: -2px;
 }
 .tags {
   background: #557292;
@@ -142,13 +145,15 @@ code {
 .controls {
   text-align: right;
   position: absolute;
-  bottom: 8px;
+  bottom: -36px;
   right: 8px;
   width: 100%;
   padding-left: 8px;
   .button {
-    height: 28px;
+    // buttons in options HELP RESET ... SAVE
+    height: 24px;
     border-radius: 3px;
+    font-size: 14px;
   }
   .reset-button,
   .delete-button {
@@ -181,8 +186,10 @@ code {
 }
 #result-list,
 #error-list {
+  // result and error boxes
   padding: 4px 6px 0 4px;
-  height: 523px;
+  // default - new height
+  height: 358px;
   overflow-x: hidden;
   overflow-y: scroll;
   a {
@@ -213,8 +220,9 @@ code {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 3px;
   }
+  // result title
   .title {
-    font-size: 18px;
+    font-size: 16px;
     margin: 0;
     font-weight: 400;
     color: #333;
@@ -224,23 +232,25 @@ code {
   }
 }
 #error-list {
+  // Error box
   position: fixed;
-  width: 494px;
-  top: 55px;
+  width: 350px;
+  top: 44px;
   overflow-y: hidden;
   display: none;
 }
+// bottom link SEARCH|TAGS|...
 #links {
-  height: 22px;
-  width: 500px;
+  height: 18px;
+  width: 350px;
   position: absolute;
-  top: 578px;
+  top: 402px;
   left: 0;
   background: #fff;
   padding: 0 8px;
-  font-size: 14px;
+  font-size: 12px;
   a {
-    color: #888;
+    color: #b6b6b6;
   }
 
   #result-counter {
@@ -250,11 +260,12 @@ code {
 
 #tags-overview,
 #folders-overview {
+  // tag and folder? containers
   position: fixed;
-  top: 55px;
+  top: 44px;
   left: 0;
-  width: 500px;
-  height: 524px;
+  width: 350px;
+  height: 358px;
   background: #eee;
   padding: 4px 8px;
   overflow-x: hidden;
@@ -269,8 +280,9 @@ code {
     width: 100%;
     a,
     a:hover {
+      // tags in tags
       color: #fff;
-      font-size: 15px;
+      font-size: 13px;
       margin: 4px 4px 0 0;
     }
   }
@@ -284,8 +296,9 @@ code {
   position: fixed;
   top: 0;
   left: 0;
-  width: 500px;
-  height: 578px;
+  // idk
+  width: 350px;
+  height: 358px;
   background: #eee;
 
   #bookmark-title {
@@ -309,12 +322,13 @@ code {
 }
 
 #options {
-  width: 500px;
-  height: 580px;
+  width: 350px;
+  height: 359.5px;
   position: fixed;
   textarea {
-    height: 426px;
-    font-size: 18px;
+    // user options
+    height: 264px;
+    font-size: 14px;
     font-family: Consolas, monospace, monospace;
     resize: none;
     padding: 4px;
@@ -323,15 +337,19 @@ code {
     padding: 2px 6px;
     background: #fff;
     border-left: 4px solid #4494c9;
+    font-size: 14px;
   }
 }
 
 #tips {
+  overflow: auto;
+  height: 402px;
   .tip {
     margin: 4px;
     padding: 2px 4px;
     background: #fff;
     border-radius: 3px;
+    font-size: 14px;
   }
   .fuzzy {
     color: #d593ea;
@@ -384,7 +402,7 @@ code {
 #folders-overview::-webkit-scrollbar,
 #tips::-webkit-scrollbar,
 .tagify__dropdown__wrapper::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
   margin-left: 4px;
   padding-left: 0px;
 }
@@ -414,7 +432,7 @@ code {
     background: #222;
     a,
     a:visited {
-      color: #999;
+      color: #e9e9e9;
     }
     a:hover {
       color: #bbb;
@@ -427,7 +445,7 @@ code {
     color: #898989;
   }
   code {
-    color: #898989;
+    color: #e9e9e9;
     background-color: #333333;
   }
   #options {
@@ -447,7 +465,7 @@ code {
   #search-approach-toggle {
     background-color: #000;
     border-bottom: 1px solid #444;
-    color: #ddd;
+    color: #b6b6b6;
   }
   #search-approach-toggle.fuzzy {
     color: #d593ea;
@@ -458,13 +476,14 @@ code {
   #result-list,
   #error-list {
     li {
+      font-size: 13px;
       background: #111;
     }
     #selected-result {
       background-color: #333;
     }
     .title {
-      color: #d4d4d4;
+      color: #e9e9e9;
     }
   }
   #links {
