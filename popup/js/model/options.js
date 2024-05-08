@@ -212,8 +212,12 @@ export const defaultOptions = {
       urlPrefix: 'https://www.google.com/search?q=$s',
     },
     {
-      name: 'Google Translate Auto/TH',
+      name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
+    },
+    {
+      name: 'Longdo Dict',
+      urlPrefix: 'https://dict.longdo.com/search/$s',
     },
     {
       name: 'Youtube',
@@ -256,6 +260,12 @@ export const defaultOptions = {
       name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
       blank: 'https://translate.google.com/',
+    },
+    {
+      alias: ['ld', 'longdo'],
+      name: 'Longdo Dict',
+      urlPrefix: 'https://dict.longdo.com/search/$s',
+      blank: 'https://dict.longdo.com/',
     },
     {
       alias: ['yt', 'youtube'],
