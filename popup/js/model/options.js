@@ -256,19 +256,19 @@ export const defaultOptions = {
       blank: 'https://www.google.com',
     },
     {
-      alias: ['gt', 'translate'],
+      alias: ['t', 'gt', 'translate'],
       name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
       blank: 'https://translate.google.com/',
     },
     {
-      alias: ['ld', 'longdo'],
+      alias: ['l', 'ld', 'longdo'],
       name: 'Longdo Dict',
       urlPrefix: 'https://dict.longdo.com/search/$s',
       blank: 'https://dict.longdo.com/',
     },
     {
-      alias: ['yt', 'youtube'],
+      alias: ['y', 'yt', 'youtube'],
       name: 'Youtube',
       urlPrefix: 'https://www.youtube.com/results?search_query=$s',
       blank: 'https://youtube.com/',
