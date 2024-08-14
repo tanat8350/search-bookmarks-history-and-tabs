@@ -5,6 +5,10 @@
 import { initExtension } from '../initSearch.js'
 import { getUserOptions, setUserOptions } from '../model/options.js'
 
+const enterCurrent = true
+const shiftNewWindow = true
+const ctrlNewTabFocus = true
+const ctrlShiftNewTab = true
 /**
  * Render the search results in UI as result items
  */
@@ -297,6 +301,21 @@ export function openResultItem(event) {
     }
   }
 
+  // added
+  if (event.ctrlKey && event.shiftKey && ctrlShiftNewTab) {
+    ext.browserApi.tabs.create({
+      active: false,
+      url: url,
+    })
+    return
+  }
+  if (event.shiftKey && shiftNewWindow) {
+    ext.browserApi.windows.create({
+      url: url,
+    })
+    return
+  }
+
   // If we press SHIFT or ALT while selecting an entry:
   // -> Open it in current tab
   if (event.shiftKey || event.altKey) {
@@ -323,6 +342,16 @@ export function openResultItem(event) {
     return
   }
 
+  // added
+  if (event.ctrlKey && ctrlNewTabFocus) {
+    ext.browserApi.tabs.create({
+      active: true,
+      url: url,
+    })
+    window.close()
+    return
+  }
+
   // If we press CTRL while selecting an entry
   // -> Open it in new tab in the background (don't close popup)
   if (event.ctrlKey) {
@@ -337,6 +366,7 @@ export function openResultItem(event) {
     return
   }
 
+  // Enter
   // If we use no modifier when selecting an entry:
   // -> Navigate to selected tab or link. Prefer browser tab API if available.
   const foundTab = ext.model.tabs.find((el) => {
@@ -356,6 +386,25 @@ export function openResultItem(event) {
 
     window.close()
   } else if (ext.browserApi.tabs) {
+    // add
+    if (enterCurrent) {
+      ext.browserApi.tabs
+        .query({
+          active: true,
+          currentWindow: true,
+        })
+        .then(([currentTab]) => {
+          ext.browserApi.tabs.update(currentTab.id, {
+            url: url,
+          })
+
+          window.close()
+        })
+        .catch(console.error)
+      return
+    }
+    ///
+
     ext.browserApi.tabs.create({
       active: true,
       url: url,
