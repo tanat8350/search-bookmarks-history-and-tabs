@@ -223,6 +223,10 @@ export const defaultOptions = {
       name: 'Youtube',
       urlPrefix: 'https://www.youtube.com/results?search_query=$s',
     },
+    {
+      name: 'My Github',
+      urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
+    },
     // {
     //   name: 'Bing',
     //   urlPrefix: 'https://www.bing.com/search?q=$s',
@@ -272,6 +276,12 @@ export const defaultOptions = {
       name: 'Youtube',
       urlPrefix: 'https://www.youtube.com/results?search_query=$s',
       blank: 'https://youtube.com/',
+    },
+    {
+      alias: ['gh', 'github'],
+      name: 'My Github',
+      urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
+      blank: 'https://github.com/tanat8350?tab=repositories',
     },
     // {
     //   alias: ['d', 'dict'],
