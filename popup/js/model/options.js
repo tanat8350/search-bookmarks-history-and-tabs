@@ -227,18 +227,10 @@ export const defaultOptions = {
       name: 'My Github',
       urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
     },
-    // {
-    //   name: 'Bing',
-    //   urlPrefix: 'https://www.bing.com/search?q=$s',
-    // },
-    // {
-    //   name: 'DuckDuckGo',
-    //   urlPrefix: 'https://duckduckgo.com/?q=$s',
-    // },
-    // {
-    //   name: 'dict.cc',
-    //   urlPrefix: 'https://www.dict.cc/?s=$s',
-    // },
+    {
+      name: 'Freedium',
+      urlPrefix: 'https://freedium.cfd/$s',
+    },
   ],
 
   /**
@@ -253,6 +245,7 @@ export const defaultOptions = {
    * With this, they act like a "high-priority" custom bookmark.
    */
   customSearchEngines: [
+    // these can be added in extension options tab
     {
       alias: ['g', 'google'],
       name: 'Google',
@@ -263,19 +256,19 @@ export const defaultOptions = {
       alias: ['t', 'gt', 'translate'],
       name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
-      blank: 'https://translate.google.com/',
+      blank: 'https://translate.google.com',
     },
     {
       alias: ['l', 'ld', 'longdo'],
       name: 'Longdo Dict',
       urlPrefix: 'https://dict.longdo.com/search/$s',
-      blank: 'https://dict.longdo.com/',
+      blank: 'https://dict.longdo.com',
     },
     {
       alias: ['y', 'yt', 'youtube'],
       name: 'Youtube',
       urlPrefix: 'https://www.youtube.com/results?search_query=$s',
-      blank: 'https://youtube.com/',
+      blank: 'https://youtube.com',
     },
     {
       alias: ['gh', 'github'],
@@ -283,12 +276,13 @@ export const defaultOptions = {
       urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
       blank: 'https://github.com/tanat8350?tab=repositories',
     },
-    // {
-    //   alias: ['d', 'dict'],
-    //   name: 'dict.cc',
-    //   urlPrefix: 'https://www.dict.cc/?s=$s',
-    //   blank: 'https://www.dict.cc',
-    // },
+    {
+      // after pasting link, will have to hit any key to make the extension aware of the pasted
+      alias: ['fd', 'freedium'],
+      name: 'Freedium',
+      urlPrefix: 'https://freedium.cfd/$s',
+      blank: 'https://freedium.cfd',
+    },
   ],
 
   //////////////////////////////////////////
