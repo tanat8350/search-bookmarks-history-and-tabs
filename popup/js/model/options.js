@@ -253,7 +253,8 @@ export const defaultOptions = {
       blank: 'https://www.google.com',
     },
     {
-      alias: ['t', 'gt', 'translate'],
+      // t already used for tab
+      alias: ['tr', 'gt', 'translate'],
       name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
       blank: 'https://translate.google.com',
