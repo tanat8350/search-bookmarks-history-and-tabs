@@ -254,7 +254,7 @@ export const defaultOptions = {
     },
     {
       // t already used for tab
-      alias: ['tr', 'gt', 'translate'],
+      alias: ['tt', 'tr', 'gt', 'translate'],
       name: 'Google Translate',
       urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
       blank: 'https://translate.google.com',
@@ -283,6 +283,20 @@ export const defaultOptions = {
       name: 'Freedium',
       urlPrefix: 'https://freedium.cfd/$s',
       blank: 'https://freedium.cfd',
+    },
+    {
+      // h already used for history (default)
+      alias: ['hh', 'history'],
+      name: 'History',
+      urlPrefix: 'chrome://history/all?q=$s',
+      blank: 'chrome://history/all',
+    },
+    {
+      // b already used for bookmark (default)
+      alias: ['bb', 'bookmark'],
+      name: 'Bookmark',
+      urlPrefix: 'chrome://bookmarks/?q=$s',
+      blank: 'chrome://bookmarks/',
     },
   ],
 
