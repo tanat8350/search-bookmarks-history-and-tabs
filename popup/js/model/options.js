@@ -231,6 +231,10 @@ export const defaultOptions = {
       name: 'Freedium',
       urlPrefix: 'https://freedium.cfd/$s',
     },
+    {
+      name: 'Shopee',
+      urlPrefix: 'https://shopee.co.th/search?keyword=$s',
+    },
   ],
 
   /**
@@ -297,6 +301,13 @@ export const defaultOptions = {
       name: 'Bookmark',
       urlPrefix: 'chrome://bookmarks/?q=$s',
       blank: 'chrome://bookmarks/',
+    },
+    {
+      // s already used for search (all) (default)
+      alias: ['sp', 'shopee'],
+      name: 'Shopee',
+      urlPrefix: 'https://shopee.co.th/search?keyword=$s',
+      blank: 'https://shopee.co.th',
     },
   ],
 
