@@ -297,7 +297,7 @@ export const defaultOptions = {
     },
     {
       // b already used for bookmark (default)
-      alias: ['bb', 'bookmark'],
+      alias: ['bb', 'bm', 'bookmark'],
       name: 'Bookmark',
       urlPrefix: 'chrome://bookmarks/?q=$s',
       blank: 'chrome://bookmarks/',
