@@ -5,3 +5,8 @@ popup/js/model/options.js
 # key binding
 
 popup/js/view/searchView.js
+
+# ui
+
+js/popup/_
+js/popup/view/_
