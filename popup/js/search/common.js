@@ -2,14 +2,16 @@
 // SEARCH                               //
 //////////////////////////////////////////
 
-import { printError } from '../helper/utils.js'
+import { getBrowserTabs } from '../helper/browserApi.js'
+import { cleanUpUrl, printError } from '../helper/utils.js'
 import { closeModals } from '../initSearch.js'
 import { renderSearchResults } from '../view/searchView.js'
-import { addDefaultEntries } from './defaultEntries.js'
 import { fuzzySearch } from './fuzzySearch.js'
-import { addSearchEngines, getCustomSearchEngineResult } from './searchEngines.js'
 import { simpleSearch } from './simpleSearch.js'
 import { searchTaxonomy } from './taxonomySearch.js'
+
+const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
+const protocolRegex = /^[a-zA-Z]+:\/\//
 
 /**
  * This is the main search entry point.
@@ -33,16 +35,22 @@ export async function search(event) {
       return
     }
 
-    closeModals()
+    // Get and clean up original search query
+    let searchTerm = ext.dom.searchInput.value || ''
+    searchTerm = searchTerm.trimStart().toLowerCase()
+    searchTerm = searchTerm.replace(/ +(?= )/g, '') // Remove duplicate spaces
+
+    if (!searchTerm.trim()) {
+      ext.model.result = await addDefaultEntries()
+      renderSearchResults(ext.model.result)
+      return // Early return if no search term
+    }
 
     if (ext.opts.debug) {
       performance.mark('search-start')
     }
 
-    // Get and clean up original search query
-    let searchTerm = ext.dom.searchInput.value || ''
-    searchTerm = searchTerm.trimStart().toLowerCase()
-    searchTerm = searchTerm.replace(/ +(?= )/g, '') // Remove duplicate spaces
+    closeModals()
 
     ext.model.result = []
     let searchMode = 'all'
@@ -50,7 +58,7 @@ export async function search(event) {
     // Support for various search modes
     // This is detected by looking at the first chars of the search
     if (searchTerm.startsWith('h ')) {
-      // Only history
+      // Only history and tabs
       searchMode = 'history'
       searchTerm = searchTerm.substring(2)
     } else if (searchTerm.startsWith('b ')) {
@@ -116,6 +124,19 @@ export async function search(event) {
         ext.model.result.push(...(await searchWithAlgorithm('precise', searchTerm, searchMode)))
       }
 
+      if (ext.opts.enableDirectUrl && urlRegex.test(searchTerm)) {
+        const url = protocolRegex.test(searchTerm) ? searchTerm : `https://${searchTerm.replace(/^\/+/, '')}`
+        ext.model.result.push({
+          type: 'direct',
+          title: `Direct: "${cleanUpUrl(url)}"`,
+          titleHighlighted: `Direct: "<mark>${cleanUpUrl(url)}</mark>"`,
+          url: cleanUpUrl(url),
+          urlHighlighted: cleanUpUrl(url),
+          originalUrl: url,
+          searchScore: 1,
+        })
+      }
+
       // Add search engine result items
       if (searchMode === 'all' || searchMode === 'search') {
         ext.model.result.push(...addSearchEngines(searchTerm))
@@ -154,8 +175,6 @@ export async function search(event) {
 
 /**
  * Search with a with a specific approach and combine the results.
- *
- * @searchApproach 'precise' | 'fuzzy'
  */
 export async function searchWithAlgorithm(searchApproach, searchTerm, searchMode = 'all') {
   let results = []
@@ -221,6 +240,8 @@ export function calculateFinalScore(results, searchTerm) {
       score = ext.opts.scoreSearchEngineBaseScore
     } else if (el.type === 'customSearch') {
       score = ext.opts.scoreCustomSearchEngineBaseScore
+    } else if (el.type === 'direct') {
+      score = ext.opts.scoreDirectUrlScore
     } else {
       throw new Error(`Search result type "${el.type}" not supported`)
     }
@@ -298,26 +319,13 @@ export function calculateFinalScore(results, searchTerm) {
     }
 
     // Increase score if result has been opened recently
-    if (
-      ext.opts.scoreRecentBonusScoreMaximum &&
-      ext.opts.scoreRecentBonusScorePerHour &&
-      el.lastVisitSecondsAgo != null
-    ) {
-      // Bonus score is always at least 0 (no negative scores)
-      // Take the recentBonusScoreMaximum
-      // Subtract recentBonusScorePerHour points for each hour in the past
-      score += Math.max(
-        0,
-        ext.opts.scoreRecentBonusScoreMaximum -
-          (el.lastVisitSecondsAgo / 60 / 60) * ext.opts.scoreRecentBonusScorePerHour,
-      )
+    if (ext.opts.scoreRecentBonusScoreMaximum && el.lastVisitSecondsAgo) {
+      const maxSeconds = ext.opts.historyDaysAgo * 24 * 60 * 60
+      score += Math.max(0, (1 - el.lastVisitSecondsAgo / maxSeconds) * ext.opts.scoreRecentBonusScoreMaximum)
     }
 
     // Increase score if bookmark has been added more recently
     if (ext.opts.scoreDateAddedBonusScoreMaximum && ext.opts.scoreDateAddedBonusScorePerDay && el.dateAdded != null) {
-      // Bonus score is always at least 0 (no negative scores)
-      // Take the dateAddedBonusScoreMaximum
-      // Subtract dateAddedBonusScorePerDay points for each hour in the past
       score += Math.max(
         0,
         ext.opts.scoreDateAddedBonusScoreMaximum -
@@ -350,4 +358,97 @@ export function sortResults(results, sortMode) {
   }
 
   return results
+}
+
+/**
+ * If we don't have a search term yet (or not sufficiently long), display current tab related entries.
+ *
+ * Finds out if there are any bookmarks or history that match our current open URL.
+ */
+export async function addDefaultEntries() {
+  let results = []
+
+  if (ext.model.searchMode === 'history' && ext.model.history) {
+    // Display recent history by default
+    results = ext.model.history.map((el) => {
+      return {
+        searchScore: 1,
+        ...el,
+      }
+    })
+  } else if (ext.model.searchMode === 'tabs' && ext.model.tabs) {
+    // Display last opened tabs by default
+    results = ext.model.tabs
+      .map((el) => {
+        return {
+          searchScore: 1,
+          ...el,
+        }
+      })
+      .sort((a, b) => {
+        return a.lastVisitSecondsAgo - b.lastVisitSecondsAgo
+      })
+  } else if (ext.model.searchMode === 'bookmarks' && ext.model.bookmarks) {
+    // Display all bookmarks by default
+    results = ext.model.bookmarks.map((el) => {
+      return {
+        searchScore: 1,
+        ...el,
+      }
+    })
+  } else {
+    // Default: Find bookmarks that match current page URL
+    let currentUrl = window.location.href
+    const [tab] = await getBrowserTabs({ active: true, currentWindow: true })
+    if (!tab) {
+      return []
+    }
+    // Remove trailing slash or hash from URL, so the comparison works better
+    currentUrl = tab.url.replace(/[/#]$/, '')
+    results.push(...ext.model.bookmarks.filter((el) => el.originalUrl === currentUrl))
+  }
+
+  ext.model.result = results
+  return results
+}
+
+/**
+ * Add results that use the configured search engines with the current search term
+ */
+function addSearchEngines(searchTerm) {
+  const results = []
+  if (ext.opts.enableSearchEngines) {
+    for (const searchEngine of ext.opts.searchEngineChoices) {
+      results.push(getCustomSearchEngineResult(searchTerm, searchEngine.name, searchEngine.urlPrefix))
+    }
+  }
+  return results
+}
+
+/**
+ * Adds one search result based for a custom search engine
+ * This is used by the option `customSearchEngines`
+ */
+function getCustomSearchEngineResult(searchTerm, name, urlPrefix, urlBlank, custom) {
+  let url
+  let title = `${name}: "${searchTerm}"`
+  let titleHighlighted = `${name}: "<mark>${searchTerm}</mark>"`
+  if (urlBlank && !searchTerm.trim()) {
+    url = urlBlank
+    title = name
+    titleHighlighted = name
+  } else if (urlPrefix.includes('$s')) {
+    url = urlPrefix.replace('$s', encodeURIComponent(searchTerm))
+  } else {
+    url = urlPrefix + encodeURIComponent(searchTerm)
+  }
+  return {
+    type: custom ? 'customSearch' : 'search',
+    title: title,
+    titleHighlighted: titleHighlighted,
+    url: cleanUpUrl(url),
+    urlHighlighted: cleanUpUrl(url),
+    originalUrl: url,
+    searchScore: 1,
+  }
 }

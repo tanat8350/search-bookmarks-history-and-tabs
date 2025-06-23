@@ -2,6 +2,76 @@
 
 ## [unreleased]
 
+## [v1.13.1]
+
+- **FIXED**: Fixed init result not showing current bookmark anymore
+
+## [v1.13.0]
+
+- **Added**: Support for direct URL navigation, contributed by [@berdon](https://github.com/berdon) via [#171](https://github.com/Fannon/search-bookmarks-history-and-tabs/pull/171)
+- **ADDED**: The folder and tags label on a bookmark search result are now clickable and will lead to a new search, looking for all bookmarks with the same folder / tags.
+- **IMPROVED**: Folders and Tags are now rendered with a badge for each value, now also clickable for navigation
+
+## [v1.12.0]
+
+- **CHANGED**: History cache has been removed as it caused issues with local storage size on some browser and performance gains were not clear enough.
+- **FIXED**: Dark mode button hover text color contrast was bad
+- **IMPROVED**: Internal code cleanup which leads to less code to load (minimal performance improvement)
+- **IMPROVED**: Trying out a potential fix for [#164](https://github.com/Fannon/search-bookmarks-history-and-tabs/issues/164) (Searching too quickly after opening leads to no results found)
+
+## [v1.11.0]
+
+- **FIXED**: Highlight of selected result in light-mode
+- **IMPROVED**: Firefox build is now using the browser extension Manifest v3, like Chrome or Edge.
+- **REMOVED**: Removed special build for Firefox, using Manifest v2.
+- **REMOVED**: Removed special build for Opera (they did not apply updates to the extension in their store anyway).
+
+## [v1.10.4]
+
+- **IMPROVED**: Performance of initial load
+  - Cleaned up and simplified CSS
+  - Lazy load CSS necessary for bookmark tagging and options view
+  - Lazy load uFuzzy library only when fuzzy search is used
+- **IMPROVED**: Bookmark tags are filtered:
+  - Tags that start with a number (typical for issue / ticket bookmarks) are ignored.
+  - Tag needs to be prefixed with ` #` (incl. space for separation).
+- **CHANGED**: Initial load now only looks for bookmarks and only returns those matching the current URL, not starting with it
+- **FIXED**: Re-apply search when switching search mode between precise and fuzzy
+- **REMOVED**: Removed `tabsDisplayWindowId` option, as it didn't work very well (tab IDs are long numbers and not very helpful). This was disabled by default anyway.
+
+## [v1.10.3]
+
+- **FIXED**: Deleting a bookmark via popup accidentally removed all bookmarks from index (temporarily)
+- **FIXED**: Disable browsers inbuilt "autocomplete" / "Saved Data" for the search input field
+- **FIXED**: Fixed potential crash when browser returns empty history entries (which it shouldn't do).
+
+## [v1.10.2]
+
+- **FIXED**: Bookmark tagging autocomplete was partly broken. Fixed update of dependency.
+- **CHANGED**: Moved the tips & tricks to markdown file and just link it, instead of random tips on startup.
+
+## [v1.10.0]
+
+- **NEW**: Show random tips on startup
+  - Can be disabled via option `enableHelp: false`
+- **NEW**: Right-click result to copy URL to clipboard
+- **IMPROVED**: Improved initial loading time by caching browser history in local storage
+  - The browser API to fetch history tends to be slow
+  - The default history size (`historyMaxItems`) to load has been increased to 1024
+- **IMPROVED**: Simplified options for calculating score of recently visited pages
+  - now only `scoreRecentBonusScoreMaximum` (which defaults to +20)
+- **CHORE**: Minor refactoring and cleanups, maybe with a little bit performance improvements.
+- **CHORE**: Removed SCSS build step, now it's just vanilla CSS
+
+## [v1.9.7]
+
+- **FIXED**: Fixed missing CSS font style for tagging view
+
+## [v1.9.6]
+
+- **IMPROVED**: Removed Bulma CSS as dependency, instead just use [minireset.css](https://github.com/jgthms/minireset.css) for CSS reset.
+- **CHORE**: Updated dependencies and moved this project to ESM (EcmaScript Modules)
+
 ## [v1.9.5]
 
 - **FIXED**: Open result in new tab (when holding SHIFT / ALT) was not working when there are multiple browser windows

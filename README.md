@@ -5,9 +5,9 @@
 ## Installation via Store
 
 - [Chrome Extension](https://chrome.google.com/webstore/detail/tabs-bookmark-and-history/cofpegcepiccpobikjoddpmmocficdjj?hl=en-GB&authuser=0)
-- [Firefox Addon](https://addons.mozilla.org/en-US/firefox/addon/search-tabs-bookmarks-history/)
 - [Microsoft Edge Addon](https://microsoftedge.microsoft.com/addons/detail/search-tabs-bookmarks-an/ldmbegkendnchhjppahaadhhakgfbfpo)
-- [Opera Addon](https://addons.opera.com/en/extensions/details/search-bookmarks-history-and-tabs/)
+- [Firefox Addon](https://addons.mozilla.org/en-US/firefox/addon/search-tabs-bookmarks-history/)
+- [Opera Addon](https://addons.opera.com/en/extensions/details/search-bookmarks-history-and-tabs/) (only an old version)
 
 ## Features
 
@@ -21,9 +21,11 @@ It supports two different search approaches:
 With this extension you can also **tag your bookmarks** including auto completions.
 The tags are considered when searching and can be used for navigation.
 
-The extension is very customizable (see [user options](#user-configuration)) and has a dark / light theme that is selected based on your system settings (see [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)).
+The extension is very customizable (see [user options](#user-configuration)) and has a dark / light theme that is selected based on your system settings (see [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)). It's also very lightweight (< 150kb JavaScript, including dependencies).
 
-For a list of recent changes, see [CHANGELOG.md](./CHANGELOG.md).
+> 💡 Have a look at the [Tips & Tricks](./Tips.md) collection.
+
+> 🗎 For a list of recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## Screenshots & Demo
 
@@ -37,25 +39,30 @@ For a list of recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Open selected results**: By default, the extension will open the selected result in a new active tab, or switch to an existing tab with the target url.
   - Hold `Shift` or `Alt` to open the result in the current tab
   - Hold `Ctrl` to open the result without closing the popup.
+  - Right-click to copy URL to clipboard
 - **Search Modes**: In case you want to be more selective -> use a search mode:
   - Start your query with `#`: only **bookmarks with the tag** will be returned (exact "starts with" search)
     - Supports AND search, e.g. search for `#github #pr` to only get results which have both tags
   - Start your query with `~`: only **bookmarks within the folder** will be returned (exact "starts with" search)
     - Supports AND search, e.g. search for `~Sites ~Blogs` to only get results which have both tags
-  - Start your query with `t ` (including space): only **tabs** will be searched.
   - Start your query with `b ` (including space): only **bookmarks** will be searched.
-  - Start your query with `h ` (including space): only **history** will be searched.
+  - Start your query with `h ` (including space): only **history** and **open tabs** will be searched.
+  - Start your query with `t ` (including space): only **open tabs** will be searched.
   - Start your query with `s ` (including space): only **search engines** will be proposed.
   - Custom Aliases:
     - The option `customSearchEngines` allows you to define your own search mode aliases
     - Default: Start your query with `g ` (including space): Do a Google search.
     - Default: Start your query with `d ` (including space): Do a dict.cc search.
+  - A search term that can be interpreted as URL (e.g. `example.com`) can be navigated to directly.
 - **Emacs / Vim Navigation**:
-  - `Ctrl+N` and `Ctrl+J` to navigate search results up
-  - `Ctrl+P` and `Ctrl+K` to navigate search results down
+  - `Ctrl+J` and `Ctrl+N` to navigate search results up
+  - `Ctrl+K` and `Ctrl+P` to navigate search results down
 - **Special Browser Pages**: You can add special browser pages to your bookmarks, like `chrome://downloads`.
 - **Custom Scores**: Add custom bonus scores by putting ` +<whole number>` to your bookmark title (before tags)
   - Examples: `Bookmark Title +20` or `Another Bookmark +10 #tag1 #tag2`
+- **Tags**:
+  - A bookmark title cannot start with a tag, it needs a title
+  - Tags cannot start with a number. This is how the extension filters out issue / ticket numbers.
 - This extension works best if you avoid:
   - using `#` in bookmark titles that do not indicate a tag.
   - using `~` in bookmark folder names.
@@ -80,36 +87,32 @@ An exemplary user config can look like the following example:
 ```yaml
 searchStrategy: fuzzy
 displayVisitCounter: true
-displayDateAdded: true
+historyMaxItems: 2048 # Increase max number of browser history items to load
 ```
 
-If you have troubles with performance, here are a few options that might help. Feel free to pick & choose and tune the values to your situation:
+If you have **troubles with performance**, here are a few options that might help. Feel free to pick & choose and tune the values to your situation. In particular `historyMaxItems` and how many bookmarks you have will impact init and search performance.
+
+Here is a suggestion for low-performance machines:
 
 ```yaml
-searchStrategy: precise
-searchMinMatchCharLength: 2
-displaySearchMatchHighlight: false,
-searchMaxResults: 20
-historyMaxItems: 200
+searchStrategy: precise # Precise search is faster than fuzzy search.
+searchMinMatchCharLength: 2 # Start searching only when at least 2 characters are entered
+displaySearchMatchHighlight: false, # Not highlighting search matches improves render performance.
+searchMaxResults: 20 # Number of search results can be further limited
+historyMaxItems: 512 # Number of browser history items can be further reduced
 ```
-
-> Precise search is faster than fuzzy search.
-> Start searching only when at least 2 characters are entered
-> Highlighting search matches takes some effort, this can be disabled.
-> Number of search results can be further limited
-> Number of browser history items can be further reduced
 
 Or a more advanced example:
 
 ```yaml
 searchStrategy: precise
 historyDaysAgo: 14
-historyMaxItems: 1200
+historyMaxItems: 2048
 historyIgnoreList:
+  - extension://
   - http://localhost
   - http://127.0.0.1
 colorStripeWidth: 4 # Customize width of search result color stripe
-bookmarkColor: '#46e6e6' # customize color for bookmark results
 scoreTabBaseScore: 70 # customize base score for open tabs
 searchEngineChoices:
   - name: Google
@@ -130,6 +133,7 @@ customSearchEngines:
     name: NPM
     urlPrefix: https://www.npmjs.com/search?q=$s
     blank: https://www.npmjs.com
+debug: true # Print information about loading time / statistics in dev console
 ```
 
 In case of making multilingual searching (CJK) correctly, you may need to tweak [uFuzzy](https://github.com/leeoniya/uFuzzy) options via option `ufuzzyOptions`, for example:
@@ -172,7 +176,7 @@ This extension is built to respect your privacy:
 
 ### Install and Build
 
-Prerequisite: [Node.js](https://nodejs.org/en/)
+Prerequisite: [Node.js](https://nodejs.org/en/) and use of bash shell.
 
 ```sh
 # install dependencies
@@ -182,13 +186,9 @@ npm install
 npm run build
 ```
 
-The source code for the extension can be found in [popup/](popup/) (HTML, JS and libs) and [sass/](sass/) (SCSS/CSS).
+The source code for the extension can be found in [popup/](popup/) (HTML, CSS, JS and libs).
 
-The built extensions can be found
-
-- [dist/chrome/](dist/chrome/) for Google Chrome and Microsoft Edge
-- [dist/firefox/](dist/firefox/) for Firefox
-- [dist/opera/](dist/firefox/) for Opera
+The built extensions can be found in [dist/chrome/](dist/chrome/).
 
 ### Developer Installation
 
@@ -218,8 +218,8 @@ This extension makes use of the following helpful open-source projects (thanks!)
 - https://github.com/yairEO/tagify for the tag autocomplete widget
 - https://markjs.io/ for highlighting search matches
 - https://www.npmjs.com/package/js-yaml for the user options parsing
-- https://bulma.io/ for some minimal CSS base styling
 - https://github.com/tabler/tabler-icons for icons
+- https://www.joshwcomeau.com/css/custom-css-reset/
 
 ## Feedback and Ideas
 

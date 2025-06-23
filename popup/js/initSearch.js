@@ -1,12 +1,46 @@
 import { printError } from './helper/utils.js'
-import { extensionNamespace as ext } from './model/namespace.js'
 import { getEffectiveOptions } from './model/options.js'
 import { getSearchData } from './model/searchData.js'
 import { search } from './search/common.js'
+import { addDefaultEntries } from './search/common.js'
 import { editBookmark, updateBookmark } from './view/editBookmarkView.js'
 import { loadFoldersOverview } from './view/foldersView.js'
-import { navigationKeyListener, toggleSearchApproach, updateSearchApproachToggle } from './view/searchView.js'
+import { browserApi } from './helper/browserApi.js'
+import {
+  navigationKeyListener,
+  renderSearchResults,
+  toggleSearchApproach,
+  updateSearchApproachToggle,
+} from './view/searchView.js'
 import { loadTagsOverview } from './view/tagsView.js'
+
+//////////////////////////////////////////
+// EXTENSION NAMESPACE                  //
+//////////////////////////////////////////
+
+/** Browser extension namespace */
+export const ext = {
+  /** Options */
+  opts: {},
+  /** Model / data */
+  model: {
+    /** Currently selected result item */
+    currentItem: 0,
+    /** Current search results */
+    result: [],
+  },
+  /** Search indexes */
+  index: {
+    taxonomy: {},
+  },
+  /** Commonly used DOM Elements */
+  dom: {},
+  /** The browser / extension API */
+  browserApi: browserApi,
+
+  /** Whether extension is already initialized -> ready for search */
+  initialized: false,
+}
 
 window.ext = ext
 
@@ -41,51 +75,43 @@ export async function initExtension() {
 
   updateSearchApproachToggle()
 
-  if (ext.opts.debug) {
-    performance.mark('init-dom')
-  }
-
   const { bookmarks, tabs, history } = await getSearchData()
   ext.model.tabs = tabs
   ext.model.bookmarks = bookmarks
   ext.model.history = history
 
-  if (ext.opts.debug) {
-    performance.mark('init-data-load')
-  }
   ext.initialized = true
 
   // Register Events
   document.addEventListener('keydown', navigationKeyListener)
   window.addEventListener('hashchange', hashRouter, false)
   ext.dom.searchApproachToggle.addEventListener('mouseup', toggleSearchApproach)
-  ext.dom.searchInput.addEventListener('keyup', search)
+  ext.dom.searchInput.addEventListener('input', search)
 
-  if (ext.opts.debug) {
-    performance.mark('init-router')
-  }
-  if (!document.querySelector('#result-list .message')) {
-    // Initialize the router by executing it for the first time
-    // Only do this if there are no (error / warning) messages displayed
+  // Display default entries
+  await addDefaultEntries()
+  renderSearchResults(ext.model.result)
+  if (!window.location.hash || window.location.hash === '/') {
+    // Placeholder. We could add help-text here.
+  } else {
     hashRouter()
+  }
+
+  if (document.getElementById('results-loading')) {
+    document.getElementById('results-loading').remove()
   }
 
   if (ext.opts.debug) {
     // Do some performance measurements and log it to debug
     performance.mark('init-end')
     performance.measure('init-end-to-end', 'init-start', 'init-end')
-    performance.measure('init-dom', 'init-start', 'init-dom')
-    performance.measure('init-data-load', 'init-dom', 'init-data-load')
-    performance.measure('init-router', 'init-data-load', 'init-router')
     const initPerformance = performance.getEntriesByType('measure')
     const totalInitPerformance = performance.getEntriesByName('init-end-to-end')
     console.debug('Init Performance: ' + totalInitPerformance[0].duration + 'ms', initPerformance)
     performance.clearMeasures()
   }
 
-  if (document.getElementById('results-loading')) {
-    document.getElementById('results-loading').remove()
-  }
+  search()
 }
 
 //////////////////////////////////////////

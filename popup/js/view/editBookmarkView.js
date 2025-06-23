@@ -3,7 +3,7 @@
 //////////////////////////////////////////
 
 import { browserApi, createSearchString } from '../helper/browserApi.js'
-import { cleanUpUrl, loadScript } from '../helper/utils.js'
+import { cleanUpUrl, loadCSS, loadScript } from '../helper/utils.js'
 import { resetFuzzySearchState } from '../search/fuzzySearch.js'
 import { getUniqueTags } from '../search/taxonomySearch.js'
 import { search } from '../search/common.js'
@@ -14,6 +14,8 @@ let tagifyLoaded = false
 export async function editBookmark(bookmarkId) {
   // Lazy load tagify if it has not been loaded already
   if (!tagifyLoaded) {
+    loadCSS('./lib/tagify.min.css')
+    loadCSS('./css/tagify.css')
     await loadScript('./lib/tagify.min.js')
     tagifyLoaded = true
   }
@@ -118,7 +120,7 @@ export async function deleteBookmark(bookmarkId) {
 
   // Remove item from search data and reset search caches
   ext.model.bookmarks = ext.model.bookmarks.filter((el) => {
-    el.originalId !== bookmarkId
+    return el.originalId !== bookmarkId
   })
   resetFuzzySearchState('bookmarks')
   resetSimpleSearchState('bookmarks')

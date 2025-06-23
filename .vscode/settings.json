@@ -8,6 +8,7 @@
     "fuzzysort",
     "Heimler",
     "idxs",
+    "iife",
     "jsyaml",
     "leeoniya",
     "malus",
@@ -31,5 +32,6 @@
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "eslint.experimental.useFlatConfig": true
 }

@@ -2,17 +2,14 @@
 // FUZZY SEARCH SUPPORT                 //
 //////////////////////////////////////////
 
-import { printError } from '../helper/utils.js'
+import { loadScript, printError } from '../helper/utils.js'
 
-/**
- * Memoize some state, to avoid re-creating haystack and fuzzy search instances
- */
+/** Memoize some state, to avoid re-creating haystack and fuzzy search instances */
 let state = {}
 
 /**
  * Resets state for fuzzy search. Necessary when search data changes or search string is reset.
  * If searchMode is given, will only reset that particular state.
- * Otherwise state will be reset entirely.
  */
 export function resetFuzzySearchState(searchMode) {
   if (searchMode) {
@@ -20,13 +17,19 @@ export function resetFuzzySearchState(searchMode) {
   }
 }
 
-/**
- * Uses uFuzzy to do a fuzzy search
- *
- * @see https://github.com/leeoniya/uFuzzy
- */
 export async function fuzzySearch(searchMode, searchTerm) {
-  if (searchMode === 'history' || searchMode === 'bookmarks' || searchMode === 'tabs') {
+  // Lazy load the uFuzzy library if not there already
+  if (!window['uFuzzy']) {
+    try {
+      await loadScript('./lib/uFuzzy.iife.min.js')
+    } catch (err) {
+      printError(err, 'Could not load uFuzzy')
+    }
+  }
+
+  if (searchMode === 'history') {
+    return [...fuzzySearchWithScoring(searchTerm, 'tabs'), ...fuzzySearchWithScoring(searchTerm, 'history')]
+  } else if (searchMode === 'bookmarks' || searchMode === 'tabs') {
     return fuzzySearchWithScoring(searchTerm, searchMode)
   } else if (searchMode === 'search') {
     return []
@@ -112,12 +115,6 @@ function fuzzySearchWithScoring(searchTerm, searchMode) {
         }
         if (highlightArray[1] && highlightArray[1].includes('<mark>')) {
           result.urlHighlighted = highlightArray[1]
-        }
-        if (highlightArray[2] && highlightArray[2].includes('<mark>')) {
-          result.tagsHighlighted = highlightArray[2]
-        }
-        if (highlightArray[3] && highlightArray[3].includes('<mark>')) {
-          result.folderHighlighted = highlightArray[3]
         }
 
         localResults.push({

@@ -1,11 +1,16 @@
 {
+  "manifest_version": 3,
   "name": "Search Bookmarks, History and Tabs",
   "description": "Browser extension to (fuzzy) search and navigate bookmarks, history and open tabs.",
   "homepage_url": "https://github.com/Fannon/search-bookmarks-history-and-tabs",
   "author": "Simon Heimler",
-  "version": "1.9.5",
-  "manifest_version": 3,
-  "permissions": ["tabs", "bookmarks", "history", "storage"],
+  "version": "1.13.1",
+  "permissions": [
+    "tabs",
+    "bookmarks",
+    "history",
+    "storage"
+  ],
   "action": {
     "default_popup": "/popup/index.html",
     "default_icon": {
@@ -29,5 +34,11 @@
     "32": "/images/logo-32.png",
     "48": "/images/logo-48.png",
     "128": "/images/logo-128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{bd5cec91-8853-40d9-aa80-8388a4544bd3}",
+      "strict_min_version": "126.0"
+    }
   }
 }

@@ -39,7 +39,7 @@ export const defaultOptions = {
    * Max search results. Reduce for better performance.
    * Does not apply for tag and folder search
    */
-  searchMaxResults: 50,
+  searchMaxResults: 32,
   /**
    * Minimum string characters of the search term to consider a match
    */
@@ -60,12 +60,12 @@ export const defaultOptions = {
   /**
    * Width of the left color marker in search results in pixels
    */
-  colorStripeWidth: 6,
+  colorStripeWidth: 5,
 
   /**
    * Color for bookmark results, expressed as CSS color
    */
-  bookmarkColor: '#54afaf',
+  bookmarkColor: '#3c8d8d',
   /**
    * Color for tab results, expressed as CSS color
    */
@@ -82,6 +82,10 @@ export const defaultOptions = {
    * Color for custom search results, expressed as CSS color
    */
   customSearchColor: '#ce5c2f',
+  /**
+   * Color for direct URL results, expressed as CSS color
+   */
+  directColor: '#7799CE',
 
   //////////////////////////////////////////
   // SEARCH SOURCES                       //
@@ -106,6 +110,14 @@ export const defaultOptions = {
    * Search engines can be a useful fallback mechanism to search externally for the term
    */
   enableSearchEngines: true,
+  /**
+   * Enable help and tips on startup
+   */
+  enableHelp: true,
+  /**
+   * Whether to treat URL like terms as directly navigable.
+   */
+  enableDirectUrl: true,
 
   //////////////////////////////////////////
   // DISPLAY OPTIONS                      //
@@ -161,16 +173,6 @@ export const defaultOptions = {
    * If true, only the current browser window is considered for tab indexing and switching
    */
   tabsOnlyCurrentWindow: false,
-  /**
-   * When initializing search, show a certain number of tabs, sorted by last visited
-   * Set this to 0 to disable.
-   */
-  tabsDisplayLastVisited: 0,
-  /**
-   * If true, the windowId of the tab result will be displayed
-   * This can help to with multi-window situations
-   * */
-  tabsDisplayWindowId: false,
 
   //////////////////////////////////////////
   // HISTORY OPTIONS                      //
@@ -184,14 +186,11 @@ export const defaultOptions = {
    * How many history items should be fetched at most
    * Be careful, as too many items have negative impact on startup and search performance
    */
-  historyMaxItems: 512,
+  historyMaxItems: 1024,
   /**
-   * All history items that start with the URLs given here will be skipped
-   *
-   * @example
-   * historyIgnoreList: ["http://localhost"]
+   * All history items that where the URL includes the given strings will be skipped
    */
-  historyIgnoreList: [],
+  historyIgnoreList: ['extension://'],
 
   //////////////////////////////////////////
   // SEARCH ENGINES OPTIONS               //
@@ -342,7 +341,7 @@ export const defaultOptions = {
   /**
    * Base score for history results
    */
-  scoreHistoryBaseScore: 50,
+  scoreHistoryBaseScore: 45,
   /**
    * Base score for search engine choices
    */
@@ -351,7 +350,11 @@ export const defaultOptions = {
    * Base score for custom search engine choices
    * This is set very high to ensure that it's the topmost entry
    */
-  scoreCustomSearchEngineBaseScore: 500,
+  scoreCustomSearchEngineBaseScore: 400,
+  /**
+   * Base score for a direct URL being typed in
+   */
+  scoreDirectUrlScore: 500,
 
   // FIELD WEIGHTS
   // Depending on in which field the search match was found,
@@ -405,32 +408,17 @@ export const defaultOptions = {
    * Please note that only history items within `history.daysAgo` can be considered,
    * however the visited counter itself considers your complete history.
    */
-  scoreVisitedBonusScore: 0.25,
+  scoreVisitedBonusScore: 0.5,
   /**
    * Maximum score points for visited bonus
    */
-  scoreVisitedBonusScoreMaximum: 10,
+  scoreVisitedBonusScoreMaximum: 20,
   /**
-   * Adds score points when a bookmark or history has been accessed recently.
-   * Calculated by taking the recentBonusScoreMaximum and subtract recentBonusScorePerHour
-   * for each hour the access happened in the past.
-   * There is no negative score.
-   *
-   * Example: If maximum is 24 and perHour is 0.5:
-   * * For a page just opened there will be ~20 bonus score
-   * * For a page opened 24 hours ago there will be 10 bonus score
-   * * For a page opened 48 hours ago there will be 0 bonus score
+   * Adds score points when item has been visited recently.
+   * If it has been visited just now, score is maximum
+   * If it has been visited at the end of `historyDaysAgo`, score is 0
    */
-  scoreRecentBonusScorePerHour: 0.5,
   scoreRecentBonusScoreMaximum: 20,
-  /**
-   * Adds score points when a bookmark has been added more recently.
-   * Calculated by taking the dateAddedBonusScoreMaximum and subtract dateAddedBonusScorePerDay
-   * for each day the bookmark has been added in the past.
-   * There is no negative score.
-   */
-  scoreDateAddedBonusScorePerDay: 0.1,
-  scoreDateAddedBonusScoreMaximum: 5,
 
   //////////////////////////////////////////
   // POWER USER OPTIONS                   //
@@ -452,22 +440,17 @@ export const defaultOptions = {
   uFuzzyOptions: {},
 }
 
-/**
- * If there are no options yet, use this as an empty options template
- */
 export const emptyOptions = {
   searchStrategy: defaultOptions.searchStrategy,
 }
 
 /**
- * Writes user settings to the google chrome sync storage
+ * Writes user settings to the sync storage, falls back to local storage
  *
  * @see https://developer.chrome.com/docs/extensions/reference/storage/
  */
-export async function setUserOptions(userOptions) {
+export async function setUserOptions(userOptions = {}) {
   return new Promise((resolve, reject) => {
-    userOptions = userOptions || {}
-
     try {
       validateUserOptions(userOptions)
     } catch (err) {
@@ -475,7 +458,7 @@ export async function setUserOptions(userOptions) {
       return reject(err)
     }
 
-    if (ext.browserApi.storage) {
+    if (ext.browserApi.storage && ext.browserApi.storage.sync) {
       ext.browserApi.storage.sync.set({ userOptions: userOptions }, () => {
         if (ext.browserApi.runtime.lastError) {
           return reject(ext.browserApi.runtime.lastError)
@@ -491,24 +474,23 @@ export async function setUserOptions(userOptions) {
 }
 
 /**
- * Get user options.
- * If none are stored yet, this will return the default empty options
+ * Get user options, fall back to default options
  */
 export async function getUserOptions() {
   return new Promise((resolve, reject) => {
     try {
-      if (ext.browserApi.storage && ext.browserApi.storage.sync && ext.browserApi.storage.sync.get) {
+      if (ext.browserApi.storage && ext.browserApi.storage.sync) {
         ext.browserApi.storage.sync.get(['userOptions'], (result) => {
           if (ext.browserApi.runtime.lastError) {
             return reject(ext.browserApi.runtime.lastError)
           }
-          const userOptions = migrateOptions(result.userOptions || emptyOptions)
+          const userOptions = result.userOptions || emptyOptions
           return resolve(userOptions)
         })
       } else {
         console.warn('No storage API found. Falling back to local Web Storage')
         const userOptionsString = window.localStorage.getItem('userOptions')
-        const userOptions = migrateOptions(userOptionsString ? JSON.parse(userOptionsString) : emptyOptions)
+        const userOptions = userOptionsString ? JSON.parse(userOptionsString) : emptyOptions
         return resolve(userOptions)
       }
     } catch (err) {
@@ -546,11 +528,4 @@ export function validateUserOptions(userOptions) {
       throw new Error('User options cannot be parsed into JSON: ' + err.message)
     }
   }
-}
-
-function migrateOptions(userOptions) {
-  if (userOptions && userOptions.searchStrategy === 'hybrid') {
-    userOptions.searchStrategy = 'fuzzy'
-  }
-  return userOptions
 }

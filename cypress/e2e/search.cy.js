@@ -1,6 +1,4 @@
-const interactionTime = 500
-const initTime = 500
-
+/* eslint-disable cypress/no-unnecessary-waiting */
 describe('Search View', () => {
   beforeEach(() => {
     cy.visit('/')
@@ -11,10 +9,7 @@ describe('Search View', () => {
       cy.get('#result-list').should('have.length', 1).find('#results-loading')
     })
     it('completes the initializing phase without errors', () => {
-      cy.wait(initTime).get('#results-loading').should('not.exist').checkNoErrors()
-    })
-    it('starts with no results', () => {
-      cy.get('#result-counter').contains('(0)')
+      cy.get('#results-loading').should('not.exist').checkNoErrors()
     })
   })
 
@@ -22,7 +17,7 @@ describe('Search View', () => {
     it('first result is highlighted', () => {
       cy.get('#search-input')
         .type(`JSON Edit`)
-        .get('#result-list li')
+      cy.get('#result-list li')
         .each((el, index) => {
           if (index === 0) {
             expect(el[0].id).to.equal('selected-result')
@@ -30,9 +25,9 @@ describe('Search View', () => {
             expect(el[0].id).to.not.equal('selected-result')
           }
         })
-        .get('#search-input')
+      cy.get('#search-input')
         .type('{downarrow}')
-        .get('#result-list li')
+      cy.get('#result-list li')
         .each((el, index) => {
           if (index === 1) {
             expect(el[0].id).to.equal('selected-result')
@@ -40,9 +35,10 @@ describe('Search View', () => {
             expect(el[0].id).to.not.equal('selected-result')
           }
         })
-        .get('#search-input')
+      cy.get('#search-input')
         .type('{uparrow}')
-        .get('#result-list li')
+       
+      cy.get('#result-list li')
         .each((el, index) => {
           if (index === 0) {
             expect(el[0].id).to.equal('selected-result')
@@ -50,7 +46,7 @@ describe('Search View', () => {
             expect(el[0].id).to.not.equal('selected-result')
           }
         })
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
   })
 
@@ -58,157 +54,161 @@ describe('Search View', () => {
     it('includes everything expected (title, URL etc.)', () => {
       cy.get('#search-input')
         .type(`JSON`)
-        .get('#result-list')
-        .find('[x-original-id=9]')
+      cy.get('#result-list')
+      .find('[x-original-id=7]') // Bookmark item
+      cy.get('#result-list')
+      .find('[x-original-id=5]') // Tab item
+      cy.get('#result-list')
+        .find('[x-original-id=6]') // History item
+      cy.get('#result-list')
+        .find('[x-original-id=9]') // Search engine
 
-        // Check that we have a result with a title returned
-        .get('[x-original-id=9]')
+      // Check that we have a result with a title returned
+      cy.get('[x-original-id=7]')
         .find('.title')
         .contains('JSON')
 
-        // Check that we have a result with an URL returned
-        .get('[x-original-id=9]')
+      // Check that we have a result with an URL returned
+      cy.get('[x-original-id=7]')
         .find('.url')
         .contains('json')
 
-        // expect #json tag
-        .get('[x-original-id=9]')
+      // expect #json tag
+      cy.get('[x-original-id=7]')
         .find('span.tags')
         .contains('#json')
 
-        // expect ~Tools folder
-        .get('[x-original-id=9]')
+      // expect ~Tools folder
+      cy.get('[x-original-id=7]')
         .find('span.folder')
         .contains('~Tools')
 
-        // expect lastVisited badge
-        .get('[x-original-id=9]')
-        .find('span.last-visited')
-
-        // expect score badge
-        .get('[x-original-id=9]')
+      // expect score badge
+      cy.get('[x-original-id=7]')
         .find('span.score')
 
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
   })
 
   describe('Precise search', () => {
-    it('can execute a precise search successfully', () => {
-      cy.get('#search-approach-toggle')
-        .get('#search-input')
+    it('can execute search successfully', () => {
+      cy.get('#search-approach-toggle').should('have.text', 'PRECISE')
+      cy.get('#search-input')
         .type(`JSON`)
-        .wait(initTime)
         // Make sure we get result of all types
-        .get('#result-list')
+      cy.get('#result-list')
         .should('not.have.length', 0)
-        .find('[x-original-id=9]')
-        .get('#result-list')
+        .find('[x-original-id=7]')
+      cy.get('#result-list')
         .find('li.bookmark')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.history')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.tab')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.bookmark')
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
-    it('can execute a precise search with non-ASCII chars successfully', () => {
+    it('can execute search with non-ASCII chars successfully', () => {
       cy.get('#search-approach-toggle')
-        .get('#search-input')
+      cy.get('#search-input')
         .type(`äe指事字₽`)
-        .wait(initTime)
         // Only make sure that search doesn't crash
-        .get('#result-list')
+      cy.get('#result-list')
         .should('not.have.length', 0)
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
   })
 
-  describe('Fuzzy search', () => {
+  describe('Fuzzy search', {
+    // Does not run on firefox headless, but works on firefox desktop
+    browser: '!firefox'
+  }, () => {
     it('can switch to fuzzy search successfully', () => {
-      cy.get('#search-approach-toggle')
-        .wait(interactionTime)
-        .contains('PRECISE')
-        .click()
-        .wait(interactionTime)
-        .contains('FUZZY')
-        .get('#search-input')
-        .type(`JSON`)
-        .get('li.bookmark')
-        .checkNoErrors()
+      cy.get('#search-approach-toggle').should('have.text', 'PRECISE') 
+      cy.get('#search-approach-toggle').click()
+      cy.wait(100)
+      cy.get('#search-approach-toggle').should('not.have.text', 'PRECISE')
+      cy.get('#search-approach-toggle').should('have.text', 'FUZZY')
+      cy.get('#search-input').type(`JSON`)
+      cy.get('li.bookmark').checkNoErrors()
     })
 
     it('can execute a fuzzy search successfully', () => {
-      cy.get('#search-approach-toggle')
-        .wait(interactionTime)
-        .contains('PRECISE')
-        .click()
-        .wait(interactionTime)
-        .contains('FUZZY')
-        .wait(interactionTime)
-        .get('#search-input')
+      cy.get('#search-approach-toggle').should('have.text', 'PRECISE')
+      cy.get('#search-approach-toggle').click()
+      cy.wait(100)
+      cy.get('#search-approach-toggle').should('have.text', 'FUZZY')
+      cy.get('#search-input')
         .type(`JSON`)
-        .get('li.bookmark')
-        .get('#result-list')
+      cy.get('li.bookmark')
+      cy.get('#result-list')
         .should('not.have.length', 0)
-        .find('[x-original-id=9]')
+        .find('[x-original-id=7]')
         // Check that we have all kinds of results
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.bookmark')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.history')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.tab')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.bookmark')
-        .checkNoErrors()
+      cy.checkNoErrors()
+    })
+
+    it('can execute search with non-ASCII chars successfully', () => {
+      cy.get('#search-approach-toggle').should('have.text', 'PRECISE')
+      cy.get('#search-approach-toggle').click()
+      cy.wait(100)
+      cy.get('#search-approach-toggle').should('have.text', 'FUZZY')
+      cy.get('#search-input').type(`äe指事字₽`)
+        // Only make sure that search doesn't crash
+      cy.get('#result-list')
+        .should('not.have.length', 0)
+      cy.checkNoErrors()
     })
   })
 
-  it('can execute a precise search with non-ASCII chars successfully', () => {
-    cy.get('#search-approach-toggle')
-      .wait(interactionTime)
-      .contains('PRECISE')
-      .click()
-      .wait(interactionTime)
-      .contains('FUZZY')
-      .wait(interactionTime)
-      .get('#search-input')
-      .type(`äe指事字₽`)
-      .wait(initTime)
-      // Only make sure that search doesn't crash
-      .get('#result-list')
-      .should('not.have.length', 0)
-      .checkNoErrors()
+  describe('Direct URL Search', () => {
+    it('can execute a direct URL search successfully', () => {
+      cy.get('#search-input')
+        .type(`example.com`)
+        cy.get('#result-list')
+        .should('not.have.length', 0)
+      cy.get('li.direct')
+        .should('have.length', 1)
+        .should('have.attr', 'x-open-url', 'https://example.com')
+      cy.checkNoErrors()
+    })
   })
 
   describe('Bookmark search', () => {
     it('Empty search returns recent bookmarks', () => {
       cy.get('#search-input')
         .type(`b `)
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.bookmark')
-        .get('#result-list')
-        .find('[x-original-id=9]')
-        .get('.tab')
+      cy.get('#result-list')
+        .find('[x-original-id=7]')
+      cy.get('.tab')
         .should('not.exist')
-        .get('.history')
+      cy.get('.history')
         .should('not.exist')
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
     it('returns only bookmark results', () => {
       cy.get('#search-input')
         .type(`b JSON`)
-        .get('#result-list')
-        .find('[x-original-id=9]')
-        .get('.tab')
+      cy.get('#result-list')
+        .find('[x-original-id=7]')
+      cy.get('.tab')
         .should('not.exist')
-        .get('.history')
+      cy.get('.history')
         .should('not.exist')
-        .get('#result-counter')
-        .contains('(5)')
-        .checkNoErrors()
+      cy.get('#result-counter').should('have.text', '(5)')
+      cy.checkNoErrors()
     })
   })
 
@@ -216,28 +216,28 @@ describe('Search View', () => {
     it('Empty search returns recent history', () => {
       cy.get('#search-input')
         .type(`h `)
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.history')
-        .get('#result-list')
-        .find('[x-original-id=9]')
-        .get('.tab')
+      cy.get('#result-list')
+        .find('[x-original-id=6]')
+      cy.get('.tab')
         .should('not.exist')
-        .get('.bookmark')
+      cy.get('.bookmark')
         .should('not.exist')
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
-    it('only the history results', () => {
+    it('only the history and tab results', () => {
       cy.get('#search-input')
         .type(`h JSON`)
-        .get('#result-list')
-        .find('[x-original-id=9]')
-        .get('.tab')
+      cy.get('#result-list')
+        .find('[x-original-id=8]') // history
+      cy.get('#result-list')
+        .find('[x-original-id=185]') // tab
+      cy.get('.bookmark')
         .should('not.exist')
-        .get('.bookmark')
-        .should('not.exist')
-        .get('#result-counter')
-        .contains('(3)')
-        .checkNoErrors()
+      cy.get('#result-counter')
+        .contains('(6)')
+      cy.checkNoErrors()
     })
   })
 
@@ -245,30 +245,30 @@ describe('Search View', () => {
     it('Empty search returns all open tabs', () => {
       cy.get('#search-input')
         .type(`t `)
-        .get('#result-list')
+      cy.get('#result-list')
         .find('li.tab')
-        .get('#result-list')
+      cy.get('#result-list')
         .find('[x-original-id=179]')
-        .get('.bookmark')
+      cy.get('.bookmark')
         .should('not.exist')
-        .get('.history')
+      cy.get('.history')
         .should('not.exist')
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
     it('returns only the tab results', () => {
       cy.get('#search-input')
         .type(`t JSON`)
-        .get('#result-list')
+      cy.get('#result-list')
         .find('[x-original-id=185]')
-        .get('#result-list')
+      cy.get('#result-list')
         .should('have.length', 1)
-        .get('.bookmark')
+      cy.get('.bookmark')
         .should('not.exist')
-        .get('.history')
+      cy.get('.history')
         .should('not.exist')
-        .get('#result-counter')
+      cy.get('#result-counter')
         .contains('(1)')
-        .checkNoErrors()
+      cy.checkNoErrors()
     })
   })
 })
