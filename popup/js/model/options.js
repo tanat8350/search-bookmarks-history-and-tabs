@@ -205,34 +205,19 @@ export const defaultOptions = {
    * If an '$s' is part of the urlPrefix, it will be replaced with the search term.
    * Otherwise, the search term is appended to the urlPrefix.
    */
+  // when `s`
   searchEngineChoices: [
+    {
+      name: 'Bookmark',
+      urlPrefix: 'chrome://bookmarks/?q=$s',
+    },
     {
       name: 'Google',
       urlPrefix: 'https://www.google.com/search?q=$s',
     },
     {
-      name: 'Google Translate',
-      urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
-    },
-    {
-      name: 'Longdo Dict',
-      urlPrefix: 'https://dict.longdo.com/search/$s',
-    },
-    {
-      name: 'Youtube',
-      urlPrefix: 'https://www.youtube.com/results?search_query=$s',
-    },
-    {
-      name: 'My Github',
-      urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
-    },
-    {
-      name: 'Freedium',
-      urlPrefix: 'https://freedium.cfd/$s',
-    },
-    {
-      name: 'Shopee',
-      urlPrefix: 'https://shopee.co.th/search?keyword=$s',
+      name: 'History',
+      urlPrefix: 'chrome://history/all?q=$s',
     },
   ],
 
@@ -250,49 +235,10 @@ export const defaultOptions = {
   customSearchEngines: [
     // these can be added in extension options tab
     {
-      alias: ['g', 'google'],
-      name: 'Google',
-      urlPrefix: 'https://www.google.com/search?q=$s',
-      blank: 'https://www.google.com',
-    },
-    {
-      // t already used for tab
-      alias: ['tt', 'tr', 'gt', 'translate'],
-      name: 'Google Translate',
-      urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
-      blank: 'https://translate.google.com',
-    },
-    {
-      alias: ['l', 'ld', 'longdo'],
-      name: 'Longdo Dict',
-      urlPrefix: 'https://dict.longdo.com/search/$s',
-      blank: 'https://dict.longdo.com',
-    },
-    {
-      alias: ['y', 'yt', 'youtube'],
-      name: 'Youtube',
-      urlPrefix: 'https://www.youtube.com/results?search_query=$s',
-      blank: 'https://youtube.com',
-    },
-    {
-      alias: ['gh', 'github'],
-      name: 'My Github',
-      urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
-      blank: 'https://github.com/tanat8350?tab=repositories',
-    },
-    {
-      // after pasting link, will have to hit any key to make the extension aware of the pasted
-      alias: ['fd', 'freedium'],
-      name: 'Freedium',
-      urlPrefix: 'https://freedium.cfd/$s',
-      blank: 'https://freedium.cfd',
-    },
-    {
-      // h already used for history (default)
-      alias: ['hh', 'history'],
-      name: 'History',
-      urlPrefix: 'chrome://history/all?q=$s',
-      blank: 'chrome://history/all',
+      alias: ['at', 'animetheme', 'animethemes'],
+      name: 'AnimeThemes',
+      urlPrefix: 'https://animethemes.moe/search?q=$s',
+      blank: 'https://animethemes.moe',
     },
     {
       // b already used for bookmark (default)
@@ -302,11 +248,62 @@ export const defaultOptions = {
       blank: 'chrome://bookmarks/',
     },
     {
+      // after pasting link, will have to hit any key to make the extension aware of the pasted
+      alias: ['fd', 'freedium'],
+      name: 'Freedium',
+      urlPrefix: 'https://freedium.cfd/$s',
+      blank: 'https://freedium.cfd',
+    },
+    {
+      alias: ['g', 'google'],
+      name: 'Google',
+      urlPrefix: 'https://www.google.com/search?q=$s',
+      blank: 'https://www.google.com',
+    },
+    {
+      alias: ['gh', 'github'],
+      name: 'My Github',
+      urlPrefix: 'https://github.com/tanat8350?tab=repositories&q=$s',
+      blank: 'https://github.com/tanat8350?tab=repositories',
+    },
+    {
+      // h already used for history (default)
+      alias: ['hh', 'history'],
+      name: 'History',
+      urlPrefix: 'chrome://history/all?q=$s',
+      blank: 'chrome://history/all',
+    },
+    {
+      alias: ['l', 'ld', 'longdo'],
+      name: 'Longdo Dict',
+      urlPrefix: 'https://dict.longdo.com/search/$s',
+      blank: 'https://dict.longdo.com',
+    },
+    {
+      alias: ['mal', 'myanimelist'],
+      name: 'MyAnimeList Anime',
+      urlPrefix: 'https://myanimelist.net/anime.php?q=$s',
+      blank: 'https://myanimelist.net',
+    },
+    {
       // s already used for search (all) (default)
       alias: ['sp', 'shopee'],
       name: 'Shopee',
       urlPrefix: 'https://shopee.co.th/search?keyword=$s',
       blank: 'https://shopee.co.th',
+    },
+    {
+      // t already used for tab
+      alias: ['tt', 'tr', 'gt', 'translate'],
+      name: 'Google Translate',
+      urlPrefix: 'https://translate.google.com/?sl=auto&tl=th&text=$s',
+      blank: 'https://translate.google.com',
+    },
+    {
+      alias: ['y', 'yt', 'youtube'],
+      name: 'Youtube',
+      urlPrefix: 'https://www.youtube.com/results?search_query=$s',
+      blank: 'https://youtube.com',
     },
   ],
 
