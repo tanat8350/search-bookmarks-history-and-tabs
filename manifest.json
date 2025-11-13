@@ -23,7 +23,7 @@
   "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+P",
+        "default": "Ctrl+Alt+P",
         "mac": "Command+Shift+Period"
       },
       "description": "Open search popup"
@@ -37,7 +37,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "{bd5cec91-8853-40d9-aa80-8388a4544bd3}",
+      "id": "{bd5cec91-8853-40d9-aa80-8388a4544bd1}",
       "strict_min_version": "126.0"
     }
   }
