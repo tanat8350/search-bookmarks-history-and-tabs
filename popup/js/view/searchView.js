@@ -6,10 +6,9 @@ import { timeSince } from '../helper/utils.js'
 import { getUserOptions, setUserOptions } from '../model/options.js'
 import { search } from '../search/common.js'
 
-const enterCurrent = true
-const shiftNewWindow = true
-const ctrlNewTabFocus = true
-const ctrlShiftNewTab = true
+// NOTE: config
+const browserStyle = true
+
 /**
  * Render the search results in UI as result items
  */
@@ -285,15 +284,17 @@ export function openResultItem(event) {
     }
   }
 
-  // added
-  if (event.ctrlKey && event.shiftKey && ctrlShiftNewTab) {
+  // NOTE: ctrl shift
+  if (browserStyle && event.ctrlKey && event.shiftKey) {
     ext.browserApi.tabs.create({
       active: false,
       url: url,
     })
     return
   }
-  if (event.shiftKey && shiftNewWindow) {
+
+  // NOTE: shift
+  if (browserStyle && event.shiftKey) {
     ext.browserApi.windows.create({
       url: url,
     })
@@ -304,6 +305,16 @@ export function openResultItem(event) {
   if (event.button === 2) {
     navigator.clipboard.writeText(url)
     event.preventDefault()
+    return
+  }
+
+  // NOTE: alt
+  if (browserStyle && event.altKey) {
+    ext.browserApi.tabs.create({
+      active: true,
+      url: url,
+    })
+    window.close()
     return
   }
 
@@ -329,16 +340,6 @@ export function openResultItem(event) {
     } else {
       window.location.href = url
     }
-    return
-  }
-
-  // added
-  if (event.ctrlKey && ctrlNewTabFocus) {
-    ext.browserApi.tabs.create({
-      active: true,
-      url: url,
-    })
-    window.close()
     return
   }
 
@@ -373,8 +374,8 @@ export function openResultItem(event) {
     })
     window.close()
   } else if (ext.browserApi.tabs) {
-    // add
-    if (enterCurrent) {
+    // NOTE: enter
+    if (browserStyle) {
       ext.browserApi.tabs
         .query({
           active: true,
