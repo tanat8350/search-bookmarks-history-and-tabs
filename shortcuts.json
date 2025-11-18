@@ -1,0 +1,3 @@
+{
+  "hotkeys": "nvim -O popup/tips.html popup/js/model/options.js"
+}
