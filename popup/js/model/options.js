@@ -205,7 +205,7 @@ export const defaultOptions = {
    * If an '$s' is part of the urlPrefix, it will be replaced with the search term.
    * Otherwise, the search term is appended to the urlPrefix.
    */
-  // when `s`
+  // NOTE: when `s`
   searchEngineChoices: [
     {
       name: 'Bookmark',
@@ -241,6 +241,12 @@ export const defaultOptions = {
       blank: 'https://animethemes.moe',
     },
     {
+      alias: ['as', 'awesome', 'awesomewm'],
+      name: 'AwesomeWM',
+      urlPrefix: 'https://www.google.com/search?q=$s+site%3Aawesomewm.org',
+      blank: 'https://awesomewm.org',
+    },
+    {
       // b already used for bookmark (default)
       alias: ['bb', 'bm', 'bookmark'],
       name: 'Bookmark',
@@ -267,6 +273,18 @@ export const defaultOptions = {
       blank: 'https://github.com/tanat8350?tab=repositories',
     },
     {
+      alias: ['ghs', 'github stars'],
+      name: 'My Github Stars',
+      urlPrefix: 'https://github.com/tanat8350?submit=Search&q=$s&tab=stars',
+      blank: 'https://github.com/tanat8350?tab=stars',
+    },
+    {
+      alias: ['ghsl', 'github stars list'],
+      name: 'My Github Stars (list)',
+      urlPrefix: 'https://github.com/stars/tanat8350/lists/$s',
+      blank: 'https://github.com/tanat8350?tab=stars',
+    },
+    {
       // h already used for history (default)
       alias: ['hh', 'history'],
       name: 'History',
@@ -284,6 +302,12 @@ export const defaultOptions = {
       name: 'MyAnimeList Anime',
       urlPrefix: 'https://myanimelist.net/anime.php?q=$s',
       blank: 'https://myanimelist.net',
+    },
+    {
+      alias: ['r', 'reddit'],
+      name: 'Reddit',
+      urlPrefix: 'https://www.google.com/search?q=$s+site%3Areddit.com',
+      blank: 'https://reddit.com',
     },
     {
       // s already used for search (all) (default)
